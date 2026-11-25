@@ -1,0 +1,8 @@
+.scuba{
+transition: transform 1000ms ease 0s}
+
+.scuba-position{
+    display: inline-block;
+    transition: transform  1000ms ease 0s;
+
+}
