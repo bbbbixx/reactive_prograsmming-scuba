@@ -1,4 +1,14 @@
-import { Component, ElementRef, OnInit, viewChild, ViewContainerRef } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  OnInit,
+  output,
+  viewChild,
+  ViewContainerRef,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgOptimizedImage } from '@angular/common';
 import { concatMap, elementAt, finalize, fromEvent, map, Observable, switchMap, tap } from 'rxjs';
 import { PointerAnimation } from '../pointer-animation/pointer-animation';
@@ -12,7 +22,10 @@ import { PointerAnimation } from '../pointer-animation/pointer-animation';
 export class Plane implements OnInit {
   scubaRef = viewChild<ElementRef>('scuba');
   scubapositionRef = viewChild<ElementRef>('scubaposition');
+  ateCookie = output<void>();
+  private destroyRef = inject(DestroyRef);
 
+  count = 0;
   originX = 0;
   originY = 0;
 
@@ -38,11 +51,13 @@ export class Plane implements OnInit {
           const { clientX: clickX, clientY: clickY } = event;
           return this.takeRotation$(clickX, clickY).pipe(
             switchMap(() => this.takeTranslaste$(clickX, clickY)),
+            tap(() => this.eatenCookie()),
             finalize(() => {
               componentRef.destroy();
             }),
           );
         }),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(() => {});
   }
@@ -96,5 +111,9 @@ export class Plane implements OnInit {
     const scubaX = clientRect.x + clientRect.width / 2;
     const scubaY = clientRect.y + clientRect.height / 2;
     return { scubaX, scubaY, scubaElement };
+  }
+
+  private eatenCookie() {
+    this.ateCookie.emit();
   }
 }
