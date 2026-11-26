@@ -1,0 +1,89 @@
+@property --ldr-cookie-a { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@property --ldr-cookie-b { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@property --ldr-cookie-c { syntax: "<length>"; inherits: false; initial-value: 0px; }
+.ldr-cookie {
+  --s: var(--ldr-size, 48px);
+  --c: var(--ldr-color, #b07105);
+  --chip: color-mix(in srgb, var(--c) 40%, #000);
+  position: relative;
+  width: var(--s);
+  height: var(--s);
+}
+.ldr-cookie-cookie {
+  --bite: calc(var(--s) * 0.2);
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle calc(var(--s) * 0.045) at 30% 28%, var(--chip) 92%, transparent),
+    radial-gradient(circle calc(var(--s) * 0.038) at 56% 36%, var(--chip) 92%, transparent),
+    radial-gradient(circle calc(var(--s) * 0.04) at 24% 55%, var(--chip) 92%, transparent),
+    radial-gradient(circle calc(var(--s) * 0.045) at 46% 62%, var(--chip) 92%, transparent),
+    radial-gradient(circle calc(var(--s) * 0.038) at 70% 60%, var(--chip) 92%, transparent),
+    radial-gradient(circle calc(var(--s) * 0.035) at 50% 84%, var(--chip) 92%, transparent),
+    radial-gradient(circle calc(var(--s) * 0.032) at 76% 40%, var(--chip) 92%, transparent),
+    var(--c);
+  -webkit-mask:
+    radial-gradient(circle var(--ldr-cookie-a) at 91% 9%, transparent 96%, #000),
+    radial-gradient(circle calc(var(--ldr-cookie-a) * 0.7) at 102% 26%, transparent 96%, #000),
+    radial-gradient(circle var(--ldr-cookie-b) at 98% 78%, transparent 96%, #000),
+    radial-gradient(circle calc(var(--ldr-cookie-b) * 0.7) at 89% 93%, transparent 96%, #000),
+    radial-gradient(circle var(--ldr-cookie-c) at 30% 102%, transparent 96%, #000),
+    radial-gradient(circle calc(var(--ldr-cookie-c) * 0.7) at 14% 94%, transparent 96%, #000);
+  -webkit-mask-composite: source-in;
+  mask:
+    radial-gradient(circle var(--ldr-cookie-a) at 91% 9%, transparent 96%, #000),
+    radial-gradient(circle calc(var(--ldr-cookie-a) * 0.7) at 102% 26%, transparent 96%, #000),
+    radial-gradient(circle var(--ldr-cookie-b) at 98% 78%, transparent 96%, #000),
+    radial-gradient(circle calc(var(--ldr-cookie-b) * 0.7) at 89% 93%, transparent 96%, #000),
+    radial-gradient(circle var(--ldr-cookie-c) at 30% 102%, transparent 96%, #000),
+    radial-gradient(circle calc(var(--ldr-cookie-c) * 0.7) at 14% 94%, transparent 96%, #000);
+  mask-composite: intersect;
+  animation: ldr-cookie-eat 3s infinite;
+}
+.ldr-cookie-crumb {
+  position: absolute;
+  left: 76%;
+  top: 30%;
+  width: calc(var(--s) * 0.06);
+  height: calc(var(--s) * 0.06);
+  border-radius: 30%;
+  background: var(--c);
+  opacity: 0;
+  animation: ldr-cookie-crumb 3s 0.5s infinite;
+}
+.ldr-cookie-crumb:nth-child(3) {
+  left: 86%;
+  top: 72%;
+  animation-delay: 1.22s;
+}
+.ldr-cookie-crumb:nth-child(4) {
+  left: 30%;
+  top: 88%;
+  animation-delay: 1.94s;
+}
+@keyframes ldr-cookie-eat {
+  0%, 14%  { --ldr-cookie-a: 0px; transform: scale(1) rotate(0); opacity: 1; }
+  16%      { transform: scale(0.94) rotate(-6deg); }
+  18%      { --ldr-cookie-a: var(--bite); }
+  21%, 38% { --ldr-cookie-b: 0px; transform: scale(1) rotate(0); }
+  40%      { transform: scale(0.94) rotate(-6deg); }
+  42%      { --ldr-cookie-b: var(--bite); }
+  45%, 62% { --ldr-cookie-c: 0px; transform: scale(1) rotate(0); }
+  64%      { transform: scale(0.94) rotate(-6deg); }
+  66%      { --ldr-cookie-c: var(--bite); }
+  69%, 80% { transform: scale(1) rotate(0); opacity: 1; }
+  86%      { --ldr-cookie-a: var(--bite); --ldr-cookie-b: var(--bite); --ldr-cookie-c: var(--bite); transform: scale(0.5); opacity: 0; }
+  87%, 92% { --ldr-cookie-a: 0px; --ldr-cookie-b: 0px; --ldr-cookie-c: 0px; transform: scale(0.5); opacity: 0; animation-timing-function: cubic-bezier(0.3, 1.6, 0.6, 1); }
+  100%     { transform: scale(1); opacity: 1; }
+}
+@keyframes ldr-cookie-crumb {
+  0%        { transform: translateY(0) rotate(0); opacity: 1; animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.5); }
+  20%, 100% { transform: translateY(calc(var(--s) * 0.2)) rotate(90deg); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ldr-cookie, .ldr-cookie *, .ldr-cookie::before, .ldr-cookie::after, .ldr-cookie *::before, .ldr-cookie *::after {
+    animation-duration: 3s;
+  }
+}

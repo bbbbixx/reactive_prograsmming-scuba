@@ -1,6 +1,7 @@
-import { Component, ElementRef, OnInit, viewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, viewChild, ViewContainerRef } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
-import { concatMap, elementAt, fromEvent, Observable, switchMap, tap } from 'rxjs';
+import { concatMap, elementAt, finalize, fromEvent, map, Observable, switchMap, tap } from 'rxjs';
+import { PointerAnimation } from '../pointer-animation/pointer-animation';
 
 @Component({
   imports: [NgOptimizedImage],
@@ -15,7 +16,8 @@ export class Plane implements OnInit {
   originX = 0;
   originY = 0;
 
-  constructor() {}
+  constructor(private view: ViewContainerRef) {}
+
   ngOnInit(): void {
     fromEvent<MouseEvent>(document, 'click')
       .pipe(
@@ -27,14 +29,22 @@ export class Plane implements OnInit {
             this.originY = scubaY;
           }
         }),
-        concatMap((event) => {
+        map((event) => {
+          const { clientX: clikcX, clientY: clickY } = event;
+          const componentRef = this.createPointerAnimation(clikcX, clickY);
+          return { event, componentRef };
+        }),
+        concatMap(({ event, componentRef }) => {
           const { clientX: clickX, clientY: clickY } = event;
           return this.takeRotation$(clickX, clickY).pipe(
             switchMap(() => this.takeTranslaste$(clickX, clickY)),
+            finalize(() => {
+              componentRef.destroy();
+            }),
           );
         }),
       )
-      .subscribe((event) => {});
+      .subscribe(() => {});
   }
 
   takeRotation$(clickX: number, clickY: number) {
@@ -73,6 +83,12 @@ export class Plane implements OnInit {
       }, 1000);
       return () => clearTimeout(timeoutIndex);
     });
+  }
+  private createPointerAnimation(x: number, y: number) {
+    const componentRef = this.view.createComponent(PointerAnimation);
+    componentRef.instance.x = x;
+    componentRef.instance.y = y;
+    return componentRef;
   }
   private getScubaPosition() {
     const scubaElement = this.scubaRef()?.nativeElement;
